@@ -38,8 +38,12 @@ public class StudentOperations {
         }
 
         // Check for duplicate PRN
-        if (searchByPrn(student.getPrn()) != null) {
-            throw new StudentExceptions.DuplicatePRNException(student.getPrn());
+        try {
+            if (searchByPrn(student.getPrn()) != null) {
+                throw new StudentExceptions.DuplicatePRNException(student.getPrn());
+            }
+        } catch (StudentExceptions.InvalidSearchCriteriaException | StudentExceptions.StudentNotFoundException e) {
+            // If StudentNotFoundException is caught, it means the PRN is not a duplicate, so we can proceed.
         }
 
         students.add(student);

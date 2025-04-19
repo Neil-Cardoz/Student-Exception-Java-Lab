@@ -7,6 +7,7 @@
  *
  */
 import java.util.*;
+// import StudentExceptions.EmptyStudentListException; // Ensure this package and class exist, or remove this line if unnecessary
 
 public class Main {
     public static void main(String args[]) {
@@ -82,28 +83,44 @@ public class Main {
     }
 
     private static void handleDisplayStudents(StudentOperations operations) {
-        operations.displayStudents();
+        try {
+            operations.displayStudents();
+        } catch (StudentExceptions.EmptyStudentListException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
     }
 
     private static void handleSearchByPrn(Scanner sc, StudentOperations operations) {
         System.out.print("Enter PRN to search: ");
         String searchPrn = sc.nextLine();
-        Student foundStudent = operations.searchByPrn(searchPrn);
-        if (foundStudent != null) {
-            System.out.println("Student Found: " + foundStudent);
-        } else {
-            System.out.println("Student with PRN " + searchPrn + " not found.");
+        try {
+            Student foundStudent = operations.searchByPrn(searchPrn);
+            if (foundStudent != null) {
+                System.out.println("Student Found: " + foundStudent);
+            } else {
+                System.out.println("Student with PRN " + searchPrn + " not found.");
+            }
+        } catch (StudentExceptions.InvalidSearchCriteriaException e) {
+            System.out.println("Error: Invalid search criteria. " + e.getMessage());
+        } catch (StudentExceptions.StudentNotFoundException e) {
+            System.out.println("Error: Student not found. " + e.getMessage());
         }
     }
 
     private static void handleSearchByName(Scanner sc, StudentOperations operations) {
         System.out.print("Enter Name to search: ");
         String searchName = sc.nextLine();
-        Student foundByName = operations.searchByName(searchName);
-        if (foundByName != null) {
-            System.out.println("Student Found: " + foundByName);
-        } else {
-            System.out.println("Student with Name " + searchName + " not found.");
+        try {
+            Student foundByName = operations.searchByName(searchName);
+            if (foundByName != null) {
+                System.out.println("Student Found: " + foundByName);
+            } else {
+                System.out.println("Student with Name " + searchName + " not found.");
+            }
+        } catch (StudentExceptions.InvalidSearchCriteriaException e) {
+            System.out.println("Error: Invalid search criteria. " + e.getMessage());
+        } catch (StudentExceptions.StudentNotFoundException e) {
+            System.out.println("Error: Student not found. " + e.getMessage());
         }
     }
 
@@ -111,47 +128,59 @@ public class Main {
         System.out.print("Enter position index to search: ");
         int pos = sc.nextInt();
         sc.nextLine(); // Consume newline
-        Student foundByPos = operations.searchByPosition(pos);
-        if (foundByPos != null) {
-            System.out.println("Student at position " + pos + ": " + foundByPos);
-        } else {
-            System.out.println("Invalid position.");
+        try {
+            Student foundByPos = operations.searchByPosition(pos);
+            if (foundByPos != null) {
+                System.out.println("Student at position " + pos + ": " + foundByPos);
+            }
+        } catch (StudentExceptions.InvalidSearchCriteriaException e) {
+            System.out.println("Error: Invalid search criteria. " + e.getMessage());
+        } catch (StudentExceptions.StudentNotFoundException e) {
+            System.out.println("Error: Student not found. " + e.getMessage());
         }
     }
 
-    private static void handleUpdateStudent(Scanner sc, StudentOperations operations) {
+    private static void handleUpdateStudent(Scanner sc, StudentOperations operations) throws StudentExceptions.StudentUpdateException, StudentExceptions.InvalidUpdateDataException {
         System.out.print("Enter PRN of the student to update: ");
         String updatePrn = sc.nextLine();
-        Student existingStudent = operations.searchByPrn(updatePrn);
-        if (existingStudent != null) {
-            System.out.print("Enter new Name: ");
-            String newName = sc.nextLine();
-            System.out.print("Enter new Date of Birth (DD-MM-YYYY): ");
-            String newDob = sc.nextLine();
-            System.out.print("Enter new Marks: ");
-            double newMarks = sc.nextDouble();
-            sc.nextLine(); // Consume newline
+        try {
+            Student existingStudent = operations.searchByPrn(updatePrn);
+            if (existingStudent != null) {
+                System.out.print("Enter new Name: ");
+                String newName = sc.nextLine();
+                System.out.print("Enter new Date of Birth (DD-MM-YYYY): ");
+                String newDob = sc.nextLine();
+                System.out.print("Enter new Marks: ");
+                double newMarks = sc.nextDouble();
+                sc.nextLine(); // Consume newline
 
-            Student updatedStudent = new Student(updatePrn, newName, newDob, newMarks);
-            boolean isUpdated = operations.updateStudent(updatePrn, updatedStudent);
-            if (isUpdated) {
-                System.out.println("Student updated successfully.");
+                Student updatedStudent = new Student(updatePrn, newName, newDob, newMarks);
+                try {
+                    operations.updateStudent(updatePrn, updatedStudent);
+                    System.out.println("Student updated successfully.");
+                } catch (StudentExceptions.StudentUpdateException | StudentExceptions.InvalidUpdateDataException e) {
+                    System.out.println("Error: " + e.getMessage());
+                }
             } else {
-                System.out.println("Update failed.");
+                System.out.println("Student with PRN " + updatePrn + " not found.");
             }
-        } else {
-            System.out.println("Student with PRN " + updatePrn + " not found.");
+        } catch (StudentExceptions.InvalidSearchCriteriaException e) {
+            System.out.println("Error: Invalid search criteria. " + e.getMessage());
+        } catch (StudentExceptions.StudentNotFoundException e) {
+            System.out.println("Error: Student not found. " + e.getMessage());
         }
     }
 
     private static void handleDeleteStudent(Scanner sc, StudentOperations operations) {
         System.out.print("Enter PRN of the student to delete: ");
         String deletePrn = sc.nextLine();
-        boolean isDeleted = operations.deleteStudent(deletePrn);
-        if (isDeleted) {
-            System.out.println("Student deleted successfully.");
-        } else {
-            System.out.println("Student with PRN " + deletePrn + " not found.");
+        try {
+            operations.deleteStudent(deletePrn);
+            System.out.println("Delete operation completed.");
+        } catch (StudentExceptions.StudentDeletionException e) {
+            System.out.println("Error: Unable to delete student. " + e.getMessage());
+        } catch (StudentExceptions.InvalidPRNException e) {
+            System.out.println("Error: Invalid PRN provided. " + e.getMessage());
         }
     }
 }
