@@ -13,65 +13,121 @@ public class StudentOperations {
     public StudentOperations() {
         students = new ArrayList<>();
     }
-    public void addStudent(Student student) {
-        students.add(student);
-        System.out.println("Student added successfully.");
-    }
-    // Function to display all students
-    public void displayStudents() {
-        if (students.isEmpty()) {
-            System.out.println("No students available.");
-        } else {
-            for (int i = 0; i < students.size(); i++) {
-                System.out.println("Position " + i + ": " + students.get(i));
-            }
+
+    // Validation methods
+    private void validatePRN(String prn) throws StudentExceptions.InvalidPRNException {
+        if (prn == null || prn.trim().isEmpty() || !prn.matches("\\d{11}")) {
+            throw new StudentExceptions.InvalidPRNException(prn);
         }
     }
 
-    // Function to search for a student by PRN
-    public Student searchByPrn(String prn) {
+    private void validateMarks(double marks) throws StudentExceptions.InvalidMarksException {
+        if (marks < 0 || marks > 100) {
+            throw new StudentExceptions.InvalidMarksException(marks);
+        }
+    }
+
+    public void addStudent(Student student) throws StudentExceptions.DuplicatePRNException, 
+                                                 StudentExceptions.InvalidStudentDataException {
+        // Validate student data
+        try {
+            validatePRN(student.getPrn());
+            validateMarks(student.getMarks());
+        } catch (StudentExceptions.InvalidPRNException | StudentExceptions.InvalidMarksException e) {
+            throw new StudentExceptions.InvalidStudentDataException(e.getMessage());
+        }
+
+        // Check for duplicate PRN
+        if (searchByPrn(student.getPrn()) != null) {
+            throw new StudentExceptions.DuplicatePRNException(student.getPrn());
+        }
+
+        students.add(student);
+        System.out.println("Student added successfully.");
+    }
+
+    public void displayStudents() throws StudentExceptions.EmptyStudentListException {
+        if (students.isEmpty()) {
+            throw new StudentExceptions.EmptyStudentListException();
+        }
+
+        for (int i = 0; i < students.size(); i++) {
+            System.out.println("Position " + i + ": " + students.get(i));
+        }
+    }
+
+    public Student searchByPrn(String prn) throws StudentExceptions.InvalidSearchCriteriaException, 
+                                                 StudentExceptions.StudentNotFoundException {
+        try {
+            validatePRN(prn);
+        } catch (StudentExceptions.InvalidPRNException e) {
+            throw new StudentExceptions.InvalidSearchCriteriaException(e.getMessage());
+        }
+
         for (Student student : students) {
             if (student.getPrn().equals(prn)) {
                 return student;
             }
         }
-        return null;
+        throw new StudentExceptions.StudentNotFoundException("PRN: " + prn);
     }
 
-    // Function to search for a student by name
-    public Student searchByName(String name) {
+    public Student searchByName(String name) throws StudentExceptions.InvalidSearchCriteriaException, 
+                                                  StudentExceptions.StudentNotFoundException {
+        if (name == null || name.trim().isEmpty()) {
+            throw new StudentExceptions.InvalidSearchCriteriaException("Name cannot be empty");
+        }
+
         for (Student student : students) {
             if (student.getName().equalsIgnoreCase(name)) {
                 return student;
             }
         }
-        return null;
+        throw new StudentExceptions.StudentNotFoundException("Name: " + name);
     }
-    // Function to search for a student by position (index)
-    public Student searchByPosition(int position) {
-        if (position >= 0 && position < students.size()) {
-            return students.get(position);
+
+    public Student searchByPosition(int position) throws StudentExceptions.InvalidSearchCriteriaException, 
+                                                       StudentExceptions.StudentNotFoundException {
+        if (position < 0) {
+            throw new StudentExceptions.InvalidSearchCriteriaException("Position cannot be negative");
         }
-        return null;
+
+        if (position >= students.size()) {
+            throw new StudentExceptions.StudentNotFoundException("Position: " + position);
+        }
+
+        return students.get(position);
     }
-    // Function to update a student's details based on PRN
-    public boolean updateStudent(String prn, Student updatedStudent) {
+
+    public void updateStudent(String prn, Student updatedStudent) throws StudentExceptions.StudentUpdateException, 
+                                                                       StudentExceptions.InvalidUpdateDataException {
+        try {
+            validatePRN(prn);
+            validatePRN(updatedStudent.getPrn());
+            validateMarks(updatedStudent.getMarks());
+        } catch (StudentExceptions.InvalidPRNException | StudentExceptions.InvalidMarksException e) {
+            throw new StudentExceptions.InvalidUpdateDataException(e.getMessage());
+        }
+
         for (int i = 0; i < students.size(); i++) {
             if (students.get(i).getPrn().equals(prn)) {
                 students.set(i, updatedStudent);
-                return true;
+                return;
             }
         }
-        return false;
+        throw new StudentExceptions.StudentUpdateException("Student with PRN " + prn + " not found");
     }
-    // Function to delete a student by PRN
-    public boolean deleteStudent(String prn) {
+
+    public void deleteStudent(String prn) throws StudentExceptions.StudentDeletionException, 
+                                               StudentExceptions.InvalidPRNException {
+        validatePRN(prn);
+
         for (int i = 0; i < students.size(); i++) {
             if (students.get(i).getPrn().equals(prn)) {
                 students.remove(i);
-                return true;
+                return;
             }
         }
-        return false;
+        throw new StudentExceptions.StudentDeletionException("Student with PRN " + prn + " not found");
     }
 }
