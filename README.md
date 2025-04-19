@@ -143,9 +143,9 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Author
 
-[Your Name]
+Neil Carodz
 
 ## Acknowledgments
 
 - Thanks to all contributors who have helped with testing and improvements
-- Special thanks to [Your Institution Name] for the project requirements and guidance
+- Special thanks to SIT for the project requirements and guidance
