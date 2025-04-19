@@ -30,111 +30,128 @@ public class Main {
             choice = sc.nextInt();
             sc.nextLine();
 
-            switch (choice) {
-                case 1:
-                    // Adding a new student
-                    System.out.print("Enter PRN: ");
-                    String prn = sc.nextLine();
-                    System.out.print("Enter Name: ");
-                    String name = sc.nextLine();
-                    System.out.print("Enter Date of Birth (DD-MM-YYYY): ");
-                    String dob = sc.nextLine();
-                    System.out.print("Enter Marks: ");
-                    double marks = sc.nextDouble();
-                    sc.nextLine(); // Consume newline
-
-                    Student newStudent = new Student(prn, name, dob, marks);
-                    operations.addStudent(newStudent);
-                    break;
-
-                case 2:
-                    // Displaying all students
-                    operations.displayStudents();
-                    break;
-                case 3:
-                // Searching for a student by PRN
-                System.out.print("Enter PRN to search: ");
-                String searchPrn = sc.nextLine();
-                Student foundStudent = operations.searchByPrn(searchPrn);
-                if (foundStudent != null) {
-                    System.out.println("Student Found: " + foundStudent);
-                } else {
-                    System.out.println("Student with PRN " + searchPrn + " not found.");
+            try {
+                switch (choice) {
+                    case 1:
+                        handleAddStudent(sc, operations);
+                        break;
+                    case 2:
+                        handleDisplayStudents(operations);
+                        break;
+                    case 3:
+                        handleSearchByPrn(sc, operations);
+                        break;
+                    case 4:
+                        handleSearchByName(sc, operations);
+                        break;
+                    case 5:
+                        handleSearchByPosition(sc, operations);
+                        break;
+                    case 6:
+                        handleUpdateStudent(sc, operations);
+                        break;
+                    case 7:
+                        handleDeleteStudent(sc, operations);
+                        break;
+                    case 8:
+                        System.out.println("Exiting the program. Goodbye!");
+                        break;
+                    default:
+                        System.out.println("Invalid choice. Please try again.");
                 }
-                break;
-
-                case 4:
-                    // Searching for a student by Name
-                    System.out.print("Enter Name to search: ");
-                    String searchName = sc.nextLine();
-                    Student foundByName = operations.searchByName(searchName);
-                    if (foundByName != null) {
-                        System.out.println("Student Found: " + foundByName);
-                    } else {
-                        System.out.println("Student with Name " + searchName + " not found.");
-                    }
-                    break;
-
-                case 5:
-                    // Searching for a student by position (index)
-                    System.out.print("Enter position index to search: ");
-                    int pos = sc.nextInt();
-                    sc.nextLine(); // Consume newline
-                    Student foundByPos = operations.searchByPosition(pos);
-                    if (foundByPos != null) {
-                        System.out.println("Student at position " + pos + ": " + foundByPos);
-                    } else {
-                        System.out.println("Invalid position.");
-                    }
-                    break;
-
-                case 6:
-                    // Updating a student's details
-                    System.out.print("Enter PRN of the student to update: ");
-                    String updatePrn = sc.nextLine();
-                    Student existingStudent = operations.searchByPrn(updatePrn);
-                    if (existingStudent != null) {
-                        System.out.print("Enter new Name: ");
-                        String newName = sc.nextLine();
-                        System.out.print("Enter new Date of Birth (DD-MM-YYYY): ");
-                        String newDob = sc.nextLine();
-                        System.out.print("Enter new Marks: ");
-                        double newMarks = sc.nextDouble();
-                        sc.nextLine(); // Consume newline
-
-                        Student updatedStudent = new Student(updatePrn, newName, newDob, newMarks);
-                        boolean isUpdated = operations.updateStudent(updatePrn, updatedStudent);
-                        if (isUpdated) {
-                            System.out.println("Student updated successfully.");
-                        } else {
-                            System.out.println("Update failed.");
-                        }
-                    } else {
-                        System.out.println("Student with PRN " + updatePrn + " not found.");
-                    }
-                    break;
-                case 7:
-                    // Deleting a student
-                    System.out.print("Enter PRN of the student to delete: ");
-                    String deletePrn = sc.nextLine();
-                    boolean isDeleted = operations.deleteStudent(deletePrn);
-                    if (isDeleted) {
-                        System.out.println("Student deleted successfully.");
-                    } else {
-                        System.out.println("Student with PRN " + deletePrn + " not found.");
-                    }
-                    break;
-                case 8:
-                    // Exiting the program
-                    System.out.println("Exiting the program. Goodbye!");
-                    break;
-
-                default:
-                    System.out.println("Invalid choice. Please try again.");
-                    break;
+            } catch (Exception e) {
+                System.out.println("Error: " + e.getMessage());
             }
         } while (choice != 8);
 
         sc.close();
+    }
+
+    private static void handleAddStudent(Scanner sc, StudentOperations operations) throws Exception {
+        System.out.print("Enter PRN: ");
+        String prn = sc.nextLine();
+        System.out.print("Enter Name: ");
+        String name = sc.nextLine();
+        System.out.print("Enter Date of Birth (DD-MM-YYYY): ");
+        String dob = sc.nextLine();
+        System.out.print("Enter Marks: ");
+        double marks = sc.nextDouble();
+        
+        Student newStudent = new Student(prn, name, dob, marks);
+        operations.addStudent(newStudent);
+    }
+
+    private static void handleDisplayStudents(StudentOperations operations) {
+        operations.displayStudents();
+    }
+
+    private static void handleSearchByPrn(Scanner sc, StudentOperations operations) {
+        System.out.print("Enter PRN to search: ");
+        String searchPrn = sc.nextLine();
+        Student foundStudent = operations.searchByPrn(searchPrn);
+        if (foundStudent != null) {
+            System.out.println("Student Found: " + foundStudent);
+        } else {
+            System.out.println("Student with PRN " + searchPrn + " not found.");
+        }
+    }
+
+    private static void handleSearchByName(Scanner sc, StudentOperations operations) {
+        System.out.print("Enter Name to search: ");
+        String searchName = sc.nextLine();
+        Student foundByName = operations.searchByName(searchName);
+        if (foundByName != null) {
+            System.out.println("Student Found: " + foundByName);
+        } else {
+            System.out.println("Student with Name " + searchName + " not found.");
+        }
+    }
+
+    private static void handleSearchByPosition(Scanner sc, StudentOperations operations) {
+        System.out.print("Enter position index to search: ");
+        int pos = sc.nextInt();
+        sc.nextLine(); // Consume newline
+        Student foundByPos = operations.searchByPosition(pos);
+        if (foundByPos != null) {
+            System.out.println("Student at position " + pos + ": " + foundByPos);
+        } else {
+            System.out.println("Invalid position.");
+        }
+    }
+
+    private static void handleUpdateStudent(Scanner sc, StudentOperations operations) {
+        System.out.print("Enter PRN of the student to update: ");
+        String updatePrn = sc.nextLine();
+        Student existingStudent = operations.searchByPrn(updatePrn);
+        if (existingStudent != null) {
+            System.out.print("Enter new Name: ");
+            String newName = sc.nextLine();
+            System.out.print("Enter new Date of Birth (DD-MM-YYYY): ");
+            String newDob = sc.nextLine();
+            System.out.print("Enter new Marks: ");
+            double newMarks = sc.nextDouble();
+            sc.nextLine(); // Consume newline
+
+            Student updatedStudent = new Student(updatePrn, newName, newDob, newMarks);
+            boolean isUpdated = operations.updateStudent(updatePrn, updatedStudent);
+            if (isUpdated) {
+                System.out.println("Student updated successfully.");
+            } else {
+                System.out.println("Update failed.");
             }
+        } else {
+            System.out.println("Student with PRN " + updatePrn + " not found.");
+        }
+    }
+
+    private static void handleDeleteStudent(Scanner sc, StudentOperations operations) {
+        System.out.print("Enter PRN of the student to delete: ");
+        String deletePrn = sc.nextLine();
+        boolean isDeleted = operations.deleteStudent(deletePrn);
+        if (isDeleted) {
+            System.out.println("Student deleted successfully.");
+        } else {
+            System.out.println("Student with PRN " + deletePrn + " not found.");
+        }
+    }
 }
